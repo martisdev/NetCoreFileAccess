@@ -63,6 +63,10 @@ namespace NetCoreFileAccess.SourceAccess.AccessTypes
             }            
         }
 
+        public bool TryLogin(params object[] Options)
+        {
+            return false;
+        }
         public string GetFile()
         {
             throw new NotImplementedException();

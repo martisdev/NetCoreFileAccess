@@ -1,6 +1,6 @@
 # NetCoreFileAccess
 
-    Backend for access to files from differents sources 
+    Backend for access to files from different sources 
 	
 ## Description
     

@@ -44,7 +44,11 @@ namespace NetCoreFileAccess.SourceAccess
         #region PROPERTIES
         
         public bool IsInicializing { get; private set; }
-        
+
+        public string UserName { get; set; }
+
+        public string Password { get; set; }
+
         #endregion
 
         #region CONSTRUCTORS
@@ -53,6 +57,8 @@ namespace NetCoreFileAccess.SourceAccess
         {
             _sourceAccess = sourceAccess;
             IsInicializing = sourceAccess.IsInicializing;
+            UserName = sourceAccess.UserName;
+            Password = sourceAccess.Password;
         }
 
         #endregion
@@ -61,6 +67,12 @@ namespace NetCoreFileAccess.SourceAccess
         public bool Login(string User, string Password)
         {
             return _sourceAccess.Login(User, Password);    ;
+        }
+
+
+        public bool TryLogin(params object[] Options)
+        {
+            return _sourceAccess.TryLogin();
         }
 
         public string GetFile()

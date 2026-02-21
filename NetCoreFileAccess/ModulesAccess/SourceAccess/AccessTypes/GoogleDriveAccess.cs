@@ -28,6 +28,12 @@ namespace NetCoreFileAccess.SourceAccess.AccessTypes
         {
             throw new NotImplementedException();
         }
+
+        public bool TryLogin(params object[] Options)
+        {
+            throw new NotImplementedException();
+        }
+
         public string GetFile()
         {
             throw new NotImplementedException();

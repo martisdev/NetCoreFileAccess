@@ -21,6 +21,10 @@ namespace NetCoreFileAccess.SourceAccess
         {
             return false;
         }
+        public bool TryLogin(params object[] Options)
+        {
+            return false;
+        }
 
         public string GetFile()
         {
