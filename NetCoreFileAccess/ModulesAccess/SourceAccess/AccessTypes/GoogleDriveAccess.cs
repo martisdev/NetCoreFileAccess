@@ -1,18 +1,10 @@
 ﻿using System.IO;
 
-namespace NetCoreFileAccess.SourceAccess.AccessTypes
+namespace NetCoreFileAccess.SourceAccess
 {
-
-    public class GoogleDriveAccess : ISourceAccess
+    public class GoogleDriveAccess : BaseAccess, ISourceAccess
     {
         #region PROPERTIES        
-        public string PathFile { get; set; }
-
-        public string UserName { get; set; }
-
-        public string Password { get; set; }
-        
-        public bool IsInicializing { get; set; }
 
         #endregion
 
@@ -24,27 +16,15 @@ namespace NetCoreFileAccess.SourceAccess.AccessTypes
             Password = string.Empty;
         }
         #endregion
-        public bool Login(string User, string Password)
-        {
-            throw new NotImplementedException();
-        }
 
-        public bool TryLogin(params object[] Options)
-        {
-            throw new NotImplementedException();
-        }
 
-        public string GetFile()
+        public override bool SaveFile(MemoryStream content)
+        {
+            return false;
+        }
+        public override MemoryStream GetFileData()
         {
             throw new NotImplementedException();
-        }
-        public bool SaveFile(MemoryStream content, string NameFile)
-        {
-            throw new NotImplementedException();
-        }
-        public MemoryStream GetFileData()
-        {
-                throw new NotImplementedException();
         }
     }
 }

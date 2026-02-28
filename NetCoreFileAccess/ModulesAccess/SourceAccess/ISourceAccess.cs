@@ -17,18 +17,13 @@ namespace NetCoreFileAccess.SourceAccess
 
         #region FUNCTIONS
 
-        public bool Login(string User, string Password)
+        protected bool Login(string User, string Password)
         {
             return false;
         }
-        public bool TryLogin(params object[] Options)
+        public bool TryLogin(params object [] Options)
         {
             return false;
-        }
-
-        public string GetFile()
-        {
-            return string.Empty;
         }
 
         public bool SaveFile(MemoryStream content)

@@ -3,7 +3,7 @@ using System.Security.AccessControl;
 
 namespace NetCoreFileAccess.SourceAccess.AccessTypes
 {
-    public class LocalAccess: ISourceAccess
+    public class LocalAccess: BaseAccess, ISourceAccess
     {
         #region CONSTANTS
         
@@ -13,31 +13,27 @@ namespace NetCoreFileAccess.SourceAccess.AccessTypes
         #endregion
 
         #region PROPERTIES        
-        
-        public string UserName { get; set; }
 
-        public string Password { get; set; }
-
-        public bool IsInicializing { get; set; }
-
-        public string PathFile { get; set; }
 
         #endregion
 
         #region CONSTRUCTORS
         public LocalAccess()
         {
-            PathFile = GetPathDataFile();
-            UserName = string.Empty;
-            Password = string.Empty;            
+            PathFile = GetPathDataFile();            
         }
         #endregion
 
-        #region PUBLIC METHODS 
+        #region OVERRIDE METHODS
 
-        public bool Login(string User ,string Password)
+        public override bool TryLogin(params object[] Options)
         {
-            if(IsInicializing)
+            return base.TryLogin(Options);
+        }
+
+        protected override bool Login(string User, string Password)
+        {
+            if (IsInicializing)
             {
                 IsInicializing = false;
                 UserName = User;
@@ -45,7 +41,7 @@ namespace NetCoreFileAccess.SourceAccess.AccessTypes
                 return true;
             }
             else
-            {                
+            {
                 if (File.Exists(PathFile))
                 {
                     //try to open existing file with provided credentials
@@ -54,96 +50,21 @@ namespace NetCoreFileAccess.SourceAccess.AccessTypes
                         using (FileStream file = new FileStream(PathFile, FileMode.Open, FileAccess.Read))
                         {
                             file.CopyTo(ms);
-                            bool result = CredentialsUtils.ValidateCredentials(ms, User, Password);
-                            if(result)
-                            {
-                                UserName = User;
-                                this.Password = Password;
-                            }
-                            return result;
+                            return CredentialsUtils.ValidateCredentials(ms, User, Password);                            
                         }
-                    }                    
+                    }
                 }
             }
-            UserName = string.Empty;
+            this.UserName = string.Empty;
             this.Password = string.Empty;
             return false;
         }
 
-        public bool TryLogin(params object[] Options )
-        {                        
-            // Set the password pattern for validation in the login window
-            CredentialsUtils.Pattern = Options != null && Options.Length > 0 && Options[0] is string pattern ? pattern : string.Empty; ;
+        #endregion
 
-            LoginWindows Login;
-            bool? result;
-            bool Finalize = false;
-            string message = string.Empty;
-            int attempt = 0;
+        #region PUBLIC METHODS 
 
-            do
-            {
-                attempt++;
-                Login = new LoginWindows(this.IsInicializing);
-                Login.Finalize = Finalize;
-
-                if (this.IsInicializing && Login.Finalize == false)
-                    message = "Please enter your credentials to initialize the source access.";
-                else if (message.Length == 0)
-                    message = "Please enter your credentials to login.";
-
-                result = Login.ShowDialog(SourceType.Local, message);
-
-                if (Login.Finalize)
-                    break;
-
-                if (result == true)
-                {
-                    bool resultLogin = this.Login(Login.user, Login.password);
-                    if (resultLogin == false)
-                    {
-                        message = string.Format("Login attempt {0} failed. Please enter your credentials to login again.", attempt);
-                        result = false;
-                    }
-                    else
-                    {
-                        //Create the new file for data storage
-                        if (this.IsInicializing)
-                            
-                        //Login successful, set the user and password for future use
-                        UserName = Login.user;
-                        Password = Login.password;
-                    }
-                }
-                else
-                {
-                    message = "Login cancelled by user.";
-                    Finalize = true;
-                    result = false;
-                    UserName = string.Empty;
-                    Password = string.Empty;
-                }
-
-                if (attempt >= 3)
-                {
-                    message = "Maximum login attempts exceeded.";
-                    result = false;
-                    Finalize = true;
-                    UserName = string.Empty;
-                    Password = string.Empty;
-                }
-            }
-            while ((bool)!result);
-
-            return result ?? false;
-        }
-
-        public string GetFile()
-        {
-            return string.Empty;
-        }
-
-        public bool SaveFile(MemoryStream content)
+        public override bool SaveFile(MemoryStream content)
         {
             try
             {
@@ -161,7 +82,7 @@ namespace NetCoreFileAccess.SourceAccess.AccessTypes
             catch {return false;}                
         }
 
-        public MemoryStream GetFileData()
+        public override MemoryStream GetFileData()
         {
             using (FileStream stream = new FileStream(PathFile, FileMode.Open, FileAccess.Read))
             {
@@ -171,6 +92,7 @@ namespace NetCoreFileAccess.SourceAccess.AccessTypes
                 return ms;
             }
         }
+        
         #endregion
 
         #region PRIVATE METHODS
