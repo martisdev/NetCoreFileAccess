@@ -50,6 +50,14 @@ namespace NetCoreFileAccess
                     case SourceType.Local:
                         break;
                     case SourceType.GoogleDrive:
+                        if (doc.RootElement.TryGetProperty("GoogleDrive", out var GoogleSection) && GoogleSection.ValueKind == JsonValueKind.Object)
+                        {
+                            GoogleConfig.PathFile = GoogleSection.TryGetProperty("PathFile", out var PathFileProp) ? PathFileProp.GetString() ?? string.Empty : string.Empty;
+                            GoogleConfig.PathCredential = GoogleSection.TryGetProperty("PathCredential", out var PathCredentialProp) ? PathCredentialProp.GetString() ?? string.Empty : string.Empty;
+                            GoogleConfig.ClientId = GoogleSection.TryGetProperty("clientId", out var clientIdProp) ? clientIdProp.GetString() ?? string.Empty : string.Empty;
+                            GoogleConfig.ClientSecret = GoogleSection.TryGetProperty("clientSecret", out var clientSecretProp) ? clientSecretProp.GetString() ?? string.Empty : string.Empty;
+                            GoogleConfig.Project_ID = GoogleSection.TryGetProperty("project_id", out var projectIdProp) ? projectIdProp.GetString() ?? string.Empty : string.Empty;
+                        }
                         break;
                     case SourceType.Ftp:
                         // Get the ftp credentials from the config file and set them to the static properties for later use.
@@ -171,5 +179,18 @@ namespace NetCoreFileAccess
         #endregion
 
     }
-    
+
+    public static class GoogleConfig
+    {
+        public static string PathFile { get; set; }
+        public static string PathCredential { get; set; }
+
+        public static string ClientId { get; set; }
+        public static string ClientSecret { get; set; }
+
+        public static string Project_ID { get; set; }
+
+    }
+
+
 }

@@ -23,7 +23,21 @@ namespace NetCoreFileAccess.SourceAccess
         #endregion
 
         #region OVERRIDE METHODS
-
+        /// <summary>
+        /// Attempts to log in to the FTP server using the provided credentials and connection options.
+        /// </summary>
+        /// <remarks>This method overrides the base login behavior to support FTP-specific connection
+        /// parameters. The login attempt will fail if the connection to the FTP server cannot be established or if the
+        /// provided credentials are invalid.</remarks>
+        /// <param name="Options">An array of objects containing connection parameters in the following order: <list type="number">
+        /// <item><description>Pattern object used for credential validation or login prompt
+        /// customization.</description></item> <item><description>FTP server URI as a <see
+        /// cref="string"/>.</description></item> <item><description>FTP username as a <see
+        /// cref="string"/>.</description></item> <item><description>FTP password as a <see
+        /// cref="string"/>.</description></item> <item><description>Remote file path as a <see cref="string"/>
+        /// (optional).</description></item> </list> Each parameter must be supplied in the correct position and type.
+        /// If any required parameter is missing or invalid, the login attempt may fail.</param>
+        /// <returns><see langword="true"/> if the login is successful; otherwise, <see langword="false"/>.</returns>
         public override bool TryLogin(params object[] Options)
         {
             // For FTP, we expect Options to contain the FTP credentials (username and password, ...).
@@ -39,74 +53,6 @@ namespace NetCoreFileAccess.SourceAccess
                 return base.TryLogin(PatternObj);
             }
             return false;
-        }
-
-        protected override bool Login(string User, string Password)
-        {
-            if (IsInicializing)
-            {
-                IsInicializing = false;
-                this.UserName = User;
-                this.Password = Password;
-                return true;
-            }
-            else
-            {
-                //try to open existing file with provided credentials
-                using (MemoryStream ms = GetFileData())
-                {
-                    return CredentialsUtils.ValidateCredentials(ms, User, Password);                    
-                }
-            }            
-        }
-
-        #endregion
-
-        /// <summary>
-        /// Attempts a simple FTP connection / directory listing to validate the endpoint and credentials.
-        /// Sets IsInicializing = false on success.
-        /// </summary>
-        private bool Connect()
-        {
-            if (string.IsNullOrWhiteSpace(PathFile))
-                return false;
-        
-            if (!TryCreateUri(out var uri))
-                return false;
-
-            try
-            {
-                var request = (FtpWebRequest)WebRequest.Create(uri);
-                request.Method = WebRequestMethods.Ftp.ListDirectory;
-                request.Credentials = new NetworkCredential(this.FTPUserName, this.FTPPassword);
-                request.UsePassive = true;
-                request.UseBinary = true;
-                request.KeepAlive = false;
-                request.Timeout = 15000;
-
-                using var response = (FtpWebResponse)request.GetResponse();
-                // If we got a response without exception, connection is good                
-                return true;
-            }
-            catch
-            {
-                // swallow or log as appropriate for your project
-                return false;
-            }
-        }
-
-        private bool TryCreateUri(out Uri uri)
-        {
-            uri = null!;
-            try
-            {
-                return Uri.TryCreate(this.URI, UriKind.Absolute, out uri);
-            }
-            catch
-            {
-                uri = null!;
-                return false;
-            }
         }
 
         /// <summary>
@@ -174,7 +120,7 @@ namespace NetCoreFileAccess.SourceAccess
                 request.UseBinary = true;
                 request.KeepAlive = false;
                 request.Timeout = 30000;
-                
+
                 // Read the file from the server &write to destination                
                 using var response = (FtpWebResponse)request.GetResponse();
                 using var responseStream = response.GetResponseStream();
@@ -182,7 +128,7 @@ namespace NetCoreFileAccess.SourceAccess
                 {
                     responseStream.CopyTo(ms);
                     if (ms.CanSeek) ms.Position = 0;
-                    
+
                     return ms;
                 }
             }
@@ -194,6 +140,64 @@ namespace NetCoreFileAccess.SourceAccess
 
             return ms;
         }
+
+        #endregion
+
+        #region PRIVETE METHODS
+
+        /// <summary>
+        /// Attempts a simple FTP connection / directory listing to validate the endpoint and credentials.
+        /// Sets IsInicializing = false on success.
+        /// </summary>
+        private bool Connect()
+        {
+            if (string.IsNullOrWhiteSpace(PathFile))
+                return false;
+
+            if (!TryCreateUri(out var uri))
+                return false;
+
+            try
+            {
+                var request = (FtpWebRequest)WebRequest.Create(uri);
+                request.Method = WebRequestMethods.Ftp.ListDirectory;
+                request.Credentials = new NetworkCredential(this.FTPUserName, this.FTPPassword);
+                request.UsePassive = true;
+                request.UseBinary = true;
+                request.KeepAlive = false;
+                request.Timeout = 15000;
+
+                using var response = (FtpWebResponse)request.GetResponse();
+                // If we got a response without exception, connection is good                
+                return true;
+            }
+            catch
+            {
+                // swallow or log as appropriate for your project
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Create the correct URI to connect to the FTP server, based on the provided URI and PathFile.
+        /// </summary>
+        /// <param name="uri">URI to return</param>
+        /// <returns>true id succefull, false otherwise</returns>
+        private bool TryCreateUri(out Uri uri)
+        {
+            uri = null!;
+            try
+            {
+                return Uri.TryCreate(this.URI, UriKind.Absolute, out uri);
+            }
+            catch
+            {
+                uri = null!;
+                return false;
+            }
+        }
+
+        #endregion
 
     }
 }

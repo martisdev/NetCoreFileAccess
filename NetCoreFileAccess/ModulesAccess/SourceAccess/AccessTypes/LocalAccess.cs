@@ -12,11 +12,6 @@ namespace NetCoreFileAccess.SourceAccess.AccessTypes
         private const string FILE_EXTENSION = ".fscr";
         #endregion
 
-        #region PROPERTIES        
-
-
-        #endregion
-
         #region CONSTRUCTORS
         public LocalAccess()
         {
@@ -26,44 +21,24 @@ namespace NetCoreFileAccess.SourceAccess.AccessTypes
 
         #region OVERRIDE METHODS
 
+        /// <summary>
+        /// Attempts to log in using the specified options.
+        /// </summary>
+        /// <remarks>This method overrides <see cref="base.TryLogin"/> and delegates the login attempt to
+        /// the base implementation. Refer to the documentation of the base class for details on supported options and
+        /// expected behavior.</remarks>
+        /// <param name="Options">An array of option values used to configure the login attempt. The meaning and required types of the options
+        /// depend on the implementation.</param>
+        /// <returns><see langword="true"/> if the login attempt is successful; otherwise, <see langword="false"/>.</returns>
         public override bool TryLogin(params object[] Options)
         {
+            
             return base.TryLogin(Options);
         }
 
-        protected override bool Login(string User, string Password)
-        {
-            if (IsInicializing)
-            {
-                IsInicializing = false;
-                UserName = User;
-                this.Password = Password;
-                return true;
-            }
-            else
-            {
-                if (File.Exists(PathFile))
-                {
-                    //try to open existing file with provided credentials
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        using (FileStream file = new FileStream(PathFile, FileMode.Open, FileAccess.Read))
-                        {
-                            file.CopyTo(ms);
-                            return CredentialsUtils.ValidateCredentials(ms, User, Password);                            
-                        }
-                    }
-                }
-            }
-            this.UserName = string.Empty;
-            this.Password = string.Empty;
-            return false;
-        }
-
-        #endregion
-
-        #region PUBLIC METHODS 
-
+        /// <summary>
+        /// Save to a specific file name within the PathFile (which may be a directory or base URI).
+        /// </summary>
         public override bool SaveFile(MemoryStream content)
         {
             try
@@ -82,6 +57,9 @@ namespace NetCoreFileAccess.SourceAccess.AccessTypes
             catch {return false;}                
         }
 
+        /// <summary>
+        /// Downloads the file indicated by PathFile (can be a full URI to a file).
+        /// </summary>
         public override MemoryStream GetFileData()
         {
             using (FileStream stream = new FileStream(PathFile, FileMode.Open, FileAccess.Read))
@@ -92,11 +70,15 @@ namespace NetCoreFileAccess.SourceAccess.AccessTypes
                 return ms;
             }
         }
-        
+
         #endregion
 
         #region PRIVATE METHODS
 
+        /// <summary>
+        /// Obtain the path of the data file to be used for saving and loading data. If the file does not exist, it creates a new one with a random name. If the file exists but is empty, it sets the IsInicializing flag to true to indicate that the source access is being initialized for the first time.
+        /// </summary>
+        /// <returns></returns>
         private string GetPathDataFile()
         {
             string path = Path.Combine(AppContext.BaseDirectory, DATA_FOLDER);

@@ -98,9 +98,23 @@ namespace NetCoreFileAccess.SourceAccess
         #endregion
 
         #region PRIVATE METHODS
-        protected virtual bool Login(string User, string Password)
+        protected bool Login(string User, string Password)
         {
-            return false;
+            if (IsInicializing)
+            {
+                IsInicializing = false;
+                this.UserName = User;
+                this.Password = Password;
+                return true;
+            }
+            else
+            {
+                //try to open existing file with provided credentials
+                using (MemoryStream ms = GetFileData())
+                {
+                    return CredentialsUtils.ValidateCredentials(ms, User, Password);
+                }
+            }
         }
         #endregion
 
