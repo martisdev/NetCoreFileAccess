@@ -183,9 +183,11 @@ namespace NetCoreFileAccess
     public static class GoogleConfig
     {
         public static string PathFile { get; set; }
+        
         public static string PathCredential { get; set; }
 
         public static string ClientId { get; set; }
+        
         public static string ClientSecret { get; set; }
 
         public static string Project_ID { get; set; }

@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Net;
 
 namespace NetCoreFileAccess.SourceAccess
@@ -66,6 +67,9 @@ namespace NetCoreFileAccess.SourceAccess
             if (!TryCreateUri(out var baseUri))
                 return false;
 
+            if(baseUri == null)
+                return false;
+
             Uri targetUri = new Uri(baseUri, this.PathFile);
 
             try
@@ -107,6 +111,9 @@ namespace NetCoreFileAccess.SourceAccess
                 return ms;
 
             if (!TryCreateUri(out var baseUri))
+                return ms;
+            
+            if(baseUri == null)
                 return ms;
 
             Uri targetUri = new Uri(baseUri, this.PathFile);
@@ -156,6 +163,9 @@ namespace NetCoreFileAccess.SourceAccess
 
             if (!TryCreateUri(out var uri))
                 return false;
+            
+            if (uri == null)
+                return false;
 
             try
             {
@@ -183,7 +193,7 @@ namespace NetCoreFileAccess.SourceAccess
         /// </summary>
         /// <param name="uri">URI to return</param>
         /// <returns>true id succefull, false otherwise</returns>
-        private bool TryCreateUri(out Uri uri)
+        private bool TryCreateUri(out Uri? uri)
         {
             uri = null!;
             try

@@ -18,6 +18,9 @@ namespace NetCoreFileAccess.SourceAccess
         public string Password { get; set; }
 
         public bool IsInicializing { get; set; }
+        
+        public SourceType SourceType { get; set; }
+        
         #endregion
 
         #region CONSTRUCTORS
@@ -52,7 +55,7 @@ namespace NetCoreFileAccess.SourceAccess
                 else if (message.Length == 0)
                     message = "Please enter your credentials to login.";
 
-                result = Login.ShowDialog(SourceType.Local, message);
+                result = Login.ShowDialog(this.SourceType, message);
 
                 if (Login.Finalize)
                     break;

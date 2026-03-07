@@ -20,8 +20,6 @@ namespace NetCoreFileAccess.SourceAccess
 
         private readonly ISourceAccess _sourceAccess;
 
-        private static SourceType sourceType;
-
         #endregion
 
         #region PROPERTIES
@@ -41,13 +39,22 @@ namespace NetCoreFileAccess.SourceAccess
             get {return _sourceAccess.Password; }
         }
 
+
         #endregion
 
         #region CONSTRUCTORS
 
         public SourceAccess(ISourceAccess sourceAccess)
         {
-            _sourceAccess = sourceAccess;            
+            _sourceAccess = sourceAccess;
+            if(sourceAccess is GoogleDriveAccess)
+                _sourceAccess.SourceType =   SourceType.GoogleDrive;
+            else if (sourceAccess is LocalAccess)
+                _sourceAccess.SourceType = SourceType.Local;
+             else if (sourceAccess is FtpAccess)
+                _sourceAccess.SourceType = SourceType.Ftp;
+             else
+                _sourceAccess.SourceType = SourceType.None;
         }
 
         #endregion

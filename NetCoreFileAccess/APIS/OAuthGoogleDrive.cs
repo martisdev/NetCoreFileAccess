@@ -30,6 +30,9 @@ namespace NetCoreFileAccess.APIS
         {
             _ApplicationName = AppName;
             Service = Authenticate(clientID, clientSecret, scopes, credentialPath);
+            // check if the authentication was successful and the service is not null
+
+            Service = Service ?? throw new Exception("Failed to authenticate with Google Drive API. Service is null.");
         }
 
         #endregion
@@ -56,8 +59,8 @@ namespace NetCoreFileAccess.APIS
                 "user",
                 CancellationToken.None,
                 new FileDataStore(credPath, true)).Result;
-
-            // Create Gmail service
+            
+            // Create Drive service
             var service = new DriveService(new BaseClientService.Initializer()
             {
                 HttpClientInitializer = credential,

@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Security.AccessControl;
 
-namespace NetCoreFileAccess.SourceAccess.AccessTypes
+namespace NetCoreFileAccess.SourceAccess
 {
     public class LocalAccess: BaseAccess, ISourceAccess
     {
