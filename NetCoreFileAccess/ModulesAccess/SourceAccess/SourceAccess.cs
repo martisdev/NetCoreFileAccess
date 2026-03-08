@@ -6,7 +6,7 @@ namespace NetCoreFileAccess.SourceAccess
 {
     #region ENUMS
     public enum SourceType
-    {
+    {        
         None,
         Local,
         GoogleDrive,
@@ -59,7 +59,7 @@ namespace NetCoreFileAccess.SourceAccess
 
         #endregion
         
-        #region PUBLIC FUNTIONS
+        #region PUBLIC METHODS
       
         public bool TryLogin(params object[] Options)
         {
@@ -76,6 +76,14 @@ namespace NetCoreFileAccess.SourceAccess
             return _sourceAccess.GetFileData();
         }
 
+        public List<string> GetSources()
+        {
+            return Enum.GetValues(typeof(SourceType))
+                .Cast<SourceType>()
+                .Where(s => s != SourceType.None)
+                .Select(s => s.ToString())
+                .ToList();
+        }
         #endregion
 
     }

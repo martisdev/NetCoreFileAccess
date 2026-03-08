@@ -13,9 +13,13 @@ namespace NetCoreFileAccess.APIS
 {
     public class OAuthGoogleDrive
     {
-        #region FIELDS
-        string _ApplicationName;
+        #region CONSTS
+        private const string DIR_CREDENTIALS = "credentials/";
+        #endregion
 
+        #region FIELDS
+
+        string _ApplicationName;
 
         #endregion
 
@@ -26,10 +30,10 @@ namespace NetCoreFileAccess.APIS
         #endregion
 
         #region CONSTRUCTOR
-        public OAuthGoogleDrive(string clientID, string clientSecret, string[] scopes, string credentialPath, string AppName)
+        public OAuthGoogleDrive(string clientID, string clientSecret, string[] scopes, string AppName)
         {
             _ApplicationName = AppName;
-            Service = Authenticate(clientID, clientSecret, scopes, credentialPath);
+            Service = Authenticate(clientID, clientSecret, scopes);
             // check if the authentication was successful and the service is not null
 
             Service = Service ?? throw new Exception("Failed to authenticate with Google Drive API. Service is null.");
@@ -38,7 +42,7 @@ namespace NetCoreFileAccess.APIS
         #endregion
 
         #region PRIVATE METHODS
-        private DriveService Authenticate(string clientId, string clientSecret, string[] scopes, string credPath)
+        private DriveService Authenticate(string clientId, string clientSecret, string[] scopes)
         {
             // Create OAuth 2.0 authorization flow
             var flow = new GoogleAuthorizationCodeFlow(new GoogleAuthorizationCodeFlow.Initializer
@@ -49,7 +53,7 @@ namespace NetCoreFileAccess.APIS
                     ClientSecret = clientSecret
                 },
                 Scopes = scopes,
-                DataStore = new FileDataStore(credPath, true),
+                DataStore = new FileDataStore(DIR_CREDENTIALS, true),
             });
 
             // Authorize the application
@@ -58,7 +62,7 @@ namespace NetCoreFileAccess.APIS
                 scopes,
                 "user",
                 CancellationToken.None,
-                new FileDataStore(credPath, true)).Result;
+                new FileDataStore(DIR_CREDENTIALS, true)).Result;
             
             // Create Drive service
             var service = new DriveService(new BaseClientService.Initializer()

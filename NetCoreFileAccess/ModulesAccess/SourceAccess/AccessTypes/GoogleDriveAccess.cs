@@ -2,7 +2,10 @@
 using Google.Apis.Drive.v3;
 using Google.Apis.Upload;
 using NetCoreFileAccess.APIS;
+using NetCoreFileAccess.Criptography;
+using System.Data.SqlTypes;
 using System.IO;
+using System.Text;
 
 namespace NetCoreFileAccess.SourceAccess
 {
@@ -24,8 +27,6 @@ namespace NetCoreFileAccess.SourceAccess
 
         private string _Client_secret = string.Empty;
 
-        private string _CredentialFile = string.Empty;
-        
         #endregion
 
         #region CONSTRUCTORS   
@@ -39,16 +40,14 @@ namespace NetCoreFileAccess.SourceAccess
 
         public override bool TryLogin(params object[] Options)
         {
-            this.PathFile = Options != null && Options.Length > 0 && Options[1] is string _PathFile ? _PathFile : string.Empty;
-            this._CredentialFile = Options != null && Options.Length > 0 && Options[2] is string _CredentialFile ? _CredentialFile : string.Empty;                        
-            this._Client_id = Options != null && Options.Length > 0 && Options[3] is string _ClientId ? _ClientId : string.Empty;
-            this._Client_secret = Options != null && Options.Length > 0 && Options[4] is string _ClientSecret ? _ClientSecret : string.Empty;
-            this._ApplicationName = Options != null && Options.Length > 0 && Options[5] is string _AppName ? _AppName : string.Empty;
-
+            this.PathFile = Options != null && Options.Length > 0 && Options[1] is string _PathFile ? _PathFile : string.Empty;            
+            this._Client_id = Options != null && Options.Length > 0 && Options[2] is string _ClientId ? _ClientId : string.Empty;
+            this._Client_secret = Options != null && Options.Length > 0 && Options[2] is string _ClientSecret ? _ClientSecret : string.Empty;
+            this._ApplicationName = Options != null && Options.Length > 0 && Options[4] is string _AppName ? _AppName : string.Empty;
 
             if (Connect())
             {
-                // try to loging with provided credentials,
+                // try to loging (access file content) with provided credentials,
                 // using the base TryLogin to show the login window if needed and validate the credentials pattern
                 object PatternObj = Options != null && Options.Length > 0 ? Options[0] : string.Empty;
                 return base.TryLogin(PatternObj);
@@ -173,7 +172,7 @@ namespace NetCoreFileAccess.SourceAccess
             // This typically involves authenticating with OAuth 2.0 and obtaining an access token.
             try
             {
-                _oAuthGoogleDrive = new OAuthGoogleDrive(_Client_id, _Client_secret, Scopes, _CredentialFile, _ApplicationName);
+                _oAuthGoogleDrive = new OAuthGoogleDrive(_Client_id, _Client_secret, Scopes, _ApplicationName);
                 
                 return true;
             }
@@ -260,5 +259,6 @@ namespace NetCoreFileAccess.SourceAccess
             // escape single quotes by backslash as required by Drive query syntax
             return input.Replace("'", "\\'");
         }
+
     }    
 }

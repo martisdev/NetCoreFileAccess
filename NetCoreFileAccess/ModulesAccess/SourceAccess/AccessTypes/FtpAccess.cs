@@ -6,11 +6,20 @@ namespace NetCoreFileAccess.SourceAccess
 {
     public class FtpAccess : BaseAccess, ISourceAccess
     {
-        #region PROPERTIES
+        #region MyRegion
+        private static int DEF_PORT = 21;
+        #endregion
 
-        string URI { get; set; }
-        string FTPUserName { get; set; }
-        string FTPPassword { get; set; }
+        #region FIELDS
+
+        private string URI = string.Empty;
+        
+        private int Port = DEF_PORT;
+        
+        private string FTPUserName = string.Empty;  
+
+        private string FTPPassword = string.Empty;
+        
         #endregion
 
         #region CONSTRUCTORS
@@ -43,9 +52,10 @@ namespace NetCoreFileAccess.SourceAccess
         {
             // For FTP, we expect Options to contain the FTP credentials (username and password, ...).
             this.URI = Options != null && Options.Length > 0 && Options[1] is string uri ? uri : string.Empty;
-            this.FTPUserName = Options != null && Options.Length > 0 && Options[2] is string username ? username : string.Empty;
-            this.FTPPassword = Options != null && Options.Length > 0 && Options[3] is string password ? password : string.Empty;
-            this.PathFile = Options != null && Options.Length > 0 && Options[4] is string PathFile ? PathFile : string.Empty;
+            this.Port = Options != null && Options.Length > 0 && Options[2] is int port ? port : DEF_PORT;
+            this.FTPUserName = Options != null && Options.Length > 0 && Options[3] is string username ? username : string.Empty;
+            this.FTPPassword = Options != null && Options.Length > 0 && Options[4] is string password ? password : string.Empty;
+            this.PathFile = Options != null && Options.Length > 0 && Options[5] is string PathFile ? PathFile : string.Empty;
             if (Connect())
             {
                 // try to loging with provided credentials,
@@ -70,7 +80,9 @@ namespace NetCoreFileAccess.SourceAccess
             if(baseUri == null)
                 return false;
 
+
             Uri targetUri = new Uri(baseUri, this.PathFile);
+
 
             try
             {
@@ -174,11 +186,11 @@ namespace NetCoreFileAccess.SourceAccess
                 request.Credentials = new NetworkCredential(this.FTPUserName, this.FTPPassword);
                 request.UsePassive = true;
                 request.UseBinary = true;
-                request.KeepAlive = false;
+                request.KeepAlive = false;                
                 request.Timeout = 15000;
 
                 using var response = (FtpWebResponse)request.GetResponse();
-                // If we got a response without exception, connection is good                
+                // If we got a response without exception, connection is good
                 return true;
             }
             catch
@@ -198,7 +210,8 @@ namespace NetCoreFileAccess.SourceAccess
             uri = null!;
             try
             {
-                return Uri.TryCreate(this.URI, UriKind.Absolute, out uri);
+                string UriPort = string.Format("{0}:{1}", this.URI, this.Port);
+                return Uri.TryCreate(UriPort, UriKind.Absolute, out uri);
             }
             catch
             {
