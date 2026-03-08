@@ -1,21 +1,22 @@
-NetCoreFileAccess
+# NetCoreFileAccess
 
-Backend for access to files from differents sources 
+    Backend for access to files from different sources 
+	
+## Description
+    
+## Dependencies
 
-Description
-Dependencies
+    NetCore 9.0
 
-NetCore 9.0
+## Authors
+    Martí Soler - https://github.com/martisdev
 
-Authors
+    
+## Version History
 
-Martí Soler - https://github.com/martisdev
+    0.1
+        Initial Release
 
-Version History
+## License
 
-0.1
-    Initial Release
-
-License
-
-GNU Affero General Public License v3.0
+	GNU Affero General Public License v3.0
