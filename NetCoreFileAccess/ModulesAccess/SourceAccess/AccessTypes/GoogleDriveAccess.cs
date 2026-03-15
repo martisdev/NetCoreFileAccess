@@ -40,12 +40,23 @@ namespace NetCoreFileAccess.SourceAccess
 
         public override bool TryLogin(params object[] Options)
         {
-            this.PathFile = Options != null && Options.Length > 0 && Options[1] is string _PathFile ? _PathFile : string.Empty;            
-            this._Client_id = Options != null && Options.Length > 0 && Options[2] is string _ClientId ? _ClientId : string.Empty;
-            this._Client_secret = Options != null && Options.Length > 0 && Options[2] is string _ClientSecret ? _ClientSecret : string.Empty;
-            this._ApplicationName = Options != null && Options.Length > 0 && Options[4] is string _AppName ? _AppName : string.Empty;
+            bool OKConnection = false;
+            using (ProgressInfo progress = new ProgressInfo("Connecting ..."))
+            {
+                progress.Show();
+                progress.UpdateMessage("Connecting to your google account...");
 
-            if (Connect())
+                this.PathFile = Options != null && Options.Length > 0 && Options[1] is string _PathFile ? _PathFile : string.Empty;
+                this._Client_id = Options != null && Options.Length > 0 && Options[2] is string _ClientId ? _ClientId : string.Empty;
+                this._Client_secret = Options != null && Options.Length > 0 && Options[3] is string _ClientSecret ? _ClientSecret : string.Empty;
+                this._ApplicationName = Options != null && Options.Length > 0 && Options[4] is string _AppName ? _AppName : string.Empty;
+
+                OKConnection = Connect();
+                if(!OKConnection)
+                    progress.ErrorMessage("Failed to connect to Google Drive.");
+            }
+
+            if (OKConnection)
             {
                 // try to loging (access file content) with provided credentials,
                 // using the base TryLogin to show the login window if needed and validate the credentials pattern

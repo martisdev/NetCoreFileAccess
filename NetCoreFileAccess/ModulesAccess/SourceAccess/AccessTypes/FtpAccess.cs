@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Data.Common;
 using System.IO;
 using System.Net;
 
@@ -7,7 +7,10 @@ namespace NetCoreFileAccess.SourceAccess
     public class FtpAccess : BaseAccess, ISourceAccess
     {
         #region MyRegion
-        private static int DEF_PORT = 21;
+        private static int DEF_PORT = 21;        
+
+        private static string PROTOCOL_FTP = "FTP://";
+
         #endregion
 
         #region FIELDS
@@ -50,19 +53,30 @@ namespace NetCoreFileAccess.SourceAccess
         /// <returns><see langword="true"/> if the login is successful; otherwise, <see langword="false"/>.</returns>
         public override bool TryLogin(params object[] Options)
         {
-            // For FTP, we expect Options to contain the FTP credentials (username and password, ...).
-            this.URI = Options != null && Options.Length > 0 && Options[1] is string uri ? uri : string.Empty;
-            this.Port = Options != null && Options.Length > 0 && Options[2] is int port ? port : DEF_PORT;
-            this.FTPUserName = Options != null && Options.Length > 0 && Options[3] is string username ? username : string.Empty;
-            this.FTPPassword = Options != null && Options.Length > 0 && Options[4] is string password ? password : string.Empty;
-            this.PathFile = Options != null && Options.Length > 0 && Options[5] is string PathFile ? PathFile : string.Empty;
-            if (Connect())
+            bool OKConnection = false;
+            using (ProgressInfo progress = new ProgressInfo("Connecting ..."))
+            {
+                progress.Show();
+                progress.UpdateMessage("Connecting to FTP server...");
+                // For FTP, we expect Options to contain the FTP credentials (username and password, ...).
+                this.URI = Options != null && Options.Length > 0 && Options[1] is string uri ? uri : string.Empty;
+                this.Port = Options != null && Options.Length > 0 && Options[2] is int port ? port : DEF_PORT;
+                this.FTPUserName = Options != null && Options.Length > 0 && Options[3] is string username ? username : string.Empty;
+                this.FTPPassword = Options != null && Options.Length > 0 && Options[4] is string password ? password : string.Empty;
+                this.PathFile = Options != null && Options.Length > 0 && Options[5] is string PathFile ? PathFile : string.Empty;
+
+                OKConnection = Connect();
+                if (!OKConnection)
+                    progress.ErrorMessage("Failed to connect to FTP server. Please check the URI and credentials.");                
+            }
+            if( OKConnection)
             {
                 // try to loging with provided credentials,
                 // using the base TryLogin to show the login window if needed and validate the credentials pattern
                 object PatternObj = Options != null && Options.Length > 0 ? Options[0] : string.Empty;
                 return base.TryLogin(PatternObj);
             }
+
             return false;
         }
 
@@ -80,9 +94,7 @@ namespace NetCoreFileAccess.SourceAccess
             if(baseUri == null)
                 return false;
 
-
             Uri targetUri = new Uri(baseUri, this.PathFile);
-
 
             try
             {
@@ -180,7 +192,7 @@ namespace NetCoreFileAccess.SourceAccess
                 return false;
 
             try
-            {
+            {                
                 var request = (FtpWebRequest)WebRequest.Create(uri);
                 request.Method = WebRequestMethods.Ftp.ListDirectory;
                 request.Credentials = new NetworkCredential(this.FTPUserName, this.FTPPassword);
@@ -211,7 +223,10 @@ namespace NetCoreFileAccess.SourceAccess
             try
             {
                 string UriPort = string.Format("{0}:{1}", this.URI, this.Port);
-                return Uri.TryCreate(UriPort, UriKind.Absolute, out uri);
+                if(!UriPort.StartsWith(PROTOCOL_FTP))
+                    UriPort = string.Format("{0}{1}", PROTOCOL_FTP, UriPort);
+                
+                 return Uri.TryCreate(UriPort, UriKind.Absolute, out uri);
             }
             catch
             {
