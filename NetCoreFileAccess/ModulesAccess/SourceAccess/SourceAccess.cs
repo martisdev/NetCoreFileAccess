@@ -1,6 +1,4 @@
 ﻿using System.IO;
-using System.Text.Json;
-using System.Windows.Navigation;
 
 namespace NetCoreFileAccess.SourceAccess
 {
@@ -39,6 +37,7 @@ namespace NetCoreFileAccess.SourceAccess
             get {return _sourceAccess.Password; }
         }
 
+        public string? ClientAPP { get; set; }
 
         #endregion
 
@@ -55,6 +54,7 @@ namespace NetCoreFileAccess.SourceAccess
                 _sourceAccess.SourceType = SourceType.Ftp;
              else
                 _sourceAccess.SourceType = SourceType.None;
+
         }
 
         #endregion

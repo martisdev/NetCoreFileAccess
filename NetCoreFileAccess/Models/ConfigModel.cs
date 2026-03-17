@@ -1,6 +1,4 @@
 ﻿
-using System;
-
 namespace NetCoreFileAccess.Models
 {
     public class ConfigModel
@@ -21,7 +19,6 @@ namespace NetCoreFileAccess.Models
 
     public class GoogleDriveModel
     {
-        public string PathFile { get; set; } = string.Empty;
-        public string CCMng { get; set; } = string.Empty;        
+        public string PathFile { get; set; } = string.Empty;        
     }
 }

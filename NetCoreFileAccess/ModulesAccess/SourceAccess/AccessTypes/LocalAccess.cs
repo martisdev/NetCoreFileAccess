@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using System.Security.AccessControl;
 
 namespace NetCoreFileAccess.SourceAccess
 {
@@ -7,15 +6,16 @@ namespace NetCoreFileAccess.SourceAccess
     {
         #region CONSTANTS
         
-        private const string DATA_FOLDER = "data";
+        //private const string DATA_FOLDER = "data";
         
         private const string FILE_EXTENSION = ".fscr";
         #endregion
 
         #region CONSTRUCTORS
-        public LocalAccess()
+        public LocalAccess(string clientApp)
         {
-            PathFile = GetPathDataFile();            
+            this.ClientAPP = clientApp;
+            this.PathFile = GetPathDataFile();
         }
         #endregion
 
@@ -81,8 +81,8 @@ namespace NetCoreFileAccess.SourceAccess
         /// <returns></returns>
         private string GetPathDataFile()
         {
-            string path = Path.Combine(AppContext.BaseDirectory, DATA_FOLDER);
-
+            string path = Path.Combine(Environment.GetFolderPath( Environment.SpecialFolder.Personal) , this.ClientAPP);
+            
             //Create data folder if not exists
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);

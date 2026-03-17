@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 
 namespace NetCoreFileAccess.SourceAccess
 {
@@ -18,7 +13,9 @@ namespace NetCoreFileAccess.SourceAccess
         public string Password { get; set; }
 
         public bool IsInicializing { get; set; }
-        
+
+        public string ClientAPP { get; set; }
+
         public SourceType SourceType { get; set; }
         
         #endregion
@@ -29,6 +26,7 @@ namespace NetCoreFileAccess.SourceAccess
             UserName = string.Empty;
             Password = string.Empty;
             PathFile = string.Empty;
+            ClientAPP = string.Empty;
         }
         #endregion
 

@@ -4,7 +4,6 @@ namespace NetCoreFileAccess.SourceAccess
 {
     public interface ISourceAccess
     {
-        
 
         #region PROPERTIES        
         public string PathFile{get; set;}
@@ -14,6 +13,8 @@ namespace NetCoreFileAccess.SourceAccess
         public string Password { get; set; }
 
         public bool IsInicializing { get; set; }
+
+        public string ClientAPP { get; set; }
 
         public SourceType SourceType { get; set; }
 

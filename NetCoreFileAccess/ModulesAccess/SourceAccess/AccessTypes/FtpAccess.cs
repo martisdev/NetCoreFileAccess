@@ -1,5 +1,4 @@
-﻿using System.Data.Common;
-using System.IO;
+﻿using System.IO;
 using System.Net;
 
 namespace NetCoreFileAccess.SourceAccess
@@ -26,8 +25,9 @@ namespace NetCoreFileAccess.SourceAccess
         #endregion
 
         #region CONSTRUCTORS
-        public FtpAccess()
-        {            
+        public FtpAccess(string clientApp)
+        {
+            this.ClientAPP = clientApp;
             URI = string.Empty;
             FTPUserName = string.Empty;
             FTPPassword = string.Empty;

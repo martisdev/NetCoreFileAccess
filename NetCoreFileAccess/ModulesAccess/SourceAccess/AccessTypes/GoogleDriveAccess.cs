@@ -2,10 +2,7 @@
 using Google.Apis.Drive.v3;
 using Google.Apis.Upload;
 using NetCoreFileAccess.APIS;
-using NetCoreFileAccess.Criptography;
-using System.Data.SqlTypes;
 using System.IO;
-using System.Text;
 
 namespace NetCoreFileAccess.SourceAccess
 {
@@ -21,8 +18,6 @@ namespace NetCoreFileAccess.SourceAccess
         
         private OAuthGoogleDrive? _oAuthGoogleDrive = null;
         
-        private string _ApplicationName = string.Empty ;
-        
         private string _Client_id = string.Empty;
 
         private string _Client_secret = string.Empty;
@@ -30,8 +25,9 @@ namespace NetCoreFileAccess.SourceAccess
         #endregion
 
         #region CONSTRUCTORS   
-        public GoogleDriveAccess()
+        public GoogleDriveAccess(string clientApp)
         {
+            this.ClientAPP = clientApp;
             PathFile = string.Empty;
             UserName = string.Empty;
             Password = string.Empty;
@@ -48,8 +44,7 @@ namespace NetCoreFileAccess.SourceAccess
 
                 this.PathFile = Options != null && Options.Length > 0 && Options[1] is string _PathFile ? _PathFile : string.Empty;
                 this._Client_id = Options != null && Options.Length > 0 && Options[2] is string _ClientId ? _ClientId : string.Empty;
-                this._Client_secret = Options != null && Options.Length > 0 && Options[3] is string _ClientSecret ? _ClientSecret : string.Empty;
-                this._ApplicationName = Options != null && Options.Length > 0 && Options[4] is string _AppName ? _AppName : string.Empty;
+                this._Client_secret = Options != null && Options.Length > 0 && Options[3] is string _ClientSecret ? _ClientSecret : string.Empty;                
 
                 OKConnection = Connect();
                 if(!OKConnection)
@@ -183,7 +178,7 @@ namespace NetCoreFileAccess.SourceAccess
             // This typically involves authenticating with OAuth 2.0 and obtaining an access token.
             try
             {
-                _oAuthGoogleDrive = new OAuthGoogleDrive(_Client_id, _Client_secret, Scopes, _ApplicationName);
+                _oAuthGoogleDrive = new OAuthGoogleDrive(_Client_id, _Client_secret, Scopes, this.ClientAPP);
                 
                 return true;
             }
