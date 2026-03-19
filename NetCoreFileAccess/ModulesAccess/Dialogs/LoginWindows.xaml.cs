@@ -123,23 +123,25 @@ namespace NetCoreFileAccess
             switch (sourceType)
             {
                 case SourceType.Local:
-                    this.Title = "Local Login";
-                    this.TxtName.SetValue(TextBoxHelper.WatermarkProperty, "Local user Name");
-                    this.txtPsw.SetValue(TextBoxHelper.WatermarkProperty, "Local password");                    
+                    this.Title = "Local source";
+                    //this.TxtName.SetValue(TextBoxHelper.WatermarkProperty, "Local user Name");
+                    //this.txtPsw.SetValue(TextBoxHelper.WatermarkProperty, "Local password");                    
                     break;
                 case SourceType.GoogleDrive:
-                    this.Title = "Google Drive Login";
-                    this.TxtName.SetValue(TextBoxHelper.WatermarkProperty, "Google User Name");
-                    this.txtPsw.SetValue(TextBoxHelper.WatermarkProperty, "Google Password");
+                    this.Title = "Google Drive source";
+                    //this.TxtName.SetValue(TextBoxHelper.WatermarkProperty, "Google User Name");
+                    //this.txtPsw.SetValue(TextBoxHelper.WatermarkProperty, "Google Password");
                     
                     break;
                 case SourceType.Ftp:
-                    this.Title = "FTP Login";
-                    this.TxtName.SetValue(TextBoxHelper.WatermarkProperty, "FTP User Name");
-                    this.txtPsw.SetValue(TextBoxHelper.WatermarkProperty, "FTP Password");                    
+                    this.Title = "FTP source";
+                    //this.TxtName.SetValue(TextBoxHelper.WatermarkProperty, "FTP User Name");
+                    //this.txtPsw.SetValue(TextBoxHelper.WatermarkProperty, "FTP Password");                    
                     break;
             }
-            
+            this.TxtName.SetValue(TextBoxHelper.WatermarkProperty, "User Name");
+            this.txtPsw.SetValue(TextBoxHelper.WatermarkProperty, "Password");
+
             _OldInfo = message;
             this.lblMessage.Text = message;
             return base.ShowDialog();

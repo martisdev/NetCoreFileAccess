@@ -16,7 +16,10 @@ namespace NetCoreFileAccess.Criptography
 
         #region FIELDS
 
-        // Change the declaration of KEY_IV to be non-nullable and initialize it directly.
+        /// <summary>
+        ///  Inizalizer vector for AES-CBC. Must be set before encryption/decryption. 
+        ///  Should be generated randomly and kept secret for best security.
+        /// </summary>
         public static byte[] KEY_IV = new byte[IV_LENGTH];
 
         #endregion
@@ -82,6 +85,16 @@ namespace NetCoreFileAccess.Criptography
                 return null;
             }
         }
+        /// <summary>
+        /// a helper method to ensure the key is of valid length for AES (16, 24, or 32 bytes). 
+        /// If the input key is shorter, it will be repeated to fill the required length. 
+        /// If it's longer, it will be truncated. 
+        /// This allows for more flexible key input while still ensuring compatibility with AES requirements.
+        /// </summary>
+        /// <param name="keyBytes"></param>
+        /// <param name="requiredLength"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
         private static byte[] NormalizeKey(byte[] keyBytes, int requiredLength)
         {
             if (keyBytes == null) throw new ArgumentNullException(nameof(keyBytes));

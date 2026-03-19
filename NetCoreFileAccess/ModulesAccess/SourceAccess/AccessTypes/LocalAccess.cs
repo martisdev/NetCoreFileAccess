@@ -1,80 +1,44 @@
-﻿using System.IO;
+﻿using System.Diagnostics.Eventing.Reader;
+using System.IO;
 
-namespace NetCoreFileAccess.SourceAccess.AccessTypes
+namespace NetCoreFileAccess.SourceAccess
 {
-    public class LocalAccess: ISourceAccess
+    public class LocalAccess: BaseAccess, ISourceAccess
     {
         #region CONSTANTS
-        
-        private const string DATA_FOLDER = "data";
         
         private const string FILE_EXTENSION = ".fscr";
         #endregion
 
-        #region PROPERTIES        
-        
-        public string UserName { get; set; }
-
-        public string Password { get; set; }
-
-        public bool IsInicializing { get; set; }
-
-        public string PathFile { get; set; }
-            
-        #endregion
-
         #region CONSTRUCTORS
-        public LocalAccess()
+        public LocalAccess(string clientApp)
         {
-            PathFile = GetPathDataFile();
-            UserName = string.Empty;
-            Password = string.Empty;
+            this.SourceType = SourceType.Local;
+            this.ClientAPP = clientApp;
+            this.PathFile = GetPathDataFile();
         }
         #endregion
 
-        #region PUBLIC METHODS 
+        #region OVERRIDE METHODS
 
-        public bool Login(string User ,string Password)
-        {
-            if(IsInicializing)
-            {
-                IsInicializing = false;
-                UserName = User;
-                this.Password = Password;
-                return true;
-            }
-            else
-            {                
-                if (File.Exists(PathFile))
-                {
-                    //try to open existing file with provided credentials
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        using (FileStream file = new FileStream(PathFile, FileMode.Open, FileAccess.Read))
-                        {
-                            file.CopyTo(ms);
-                            bool result = CredentialsUtils.ValidateCredentials(ms, User, Password);
-                            if(result)
-                            {
-                                UserName = User;
-                                this.Password = Password;
-                            }
-                            return result;
-                        }
-                    }                    
-                }
-            }
-            UserName = string.Empty;
-            this.Password = string.Empty;
-            return false;
+        /// <summary>
+        /// Attempts to log in using the specified options.
+        /// </summary>
+        /// <remarks>This method overrides <see cref="base.TryLogin"/> and delegates the login attempt to
+        /// the base implementation. Refer to the documentation of the base class for details on supported options and
+        /// expected behavior.</remarks>
+        /// <param name="Options">An array of option values used to configure the login attempt. The meaning and required types of the options
+        /// depend on the implementation.</param>
+        /// <returns><see langword="true"/> if the login attempt is successful; otherwise, <see langword="false"/>.</returns>
+        public override bool TryLogin(params object[] Options)
+        {            
+            return base.TryLogin(Options);
         }
 
-        public string GetFile()
-        {
-            return string.Empty;
-        }
-
-        public bool SaveFile(MemoryStream content)
+        /// <summary>
+        /// Save to a specific file name within the PathFile (which may be a directory or base URI).
+        /// </summary>
+        public override bool SaveFile(MemoryStream content)
         {
             try
             {
@@ -92,7 +56,10 @@ namespace NetCoreFileAccess.SourceAccess.AccessTypes
             catch {return false;}                
         }
 
-        public MemoryStream GetFileData()
+        /// <summary>
+        /// Downloads the file indicated by PathFile (can be a full URI to a file).
+        /// </summary>
+        public override MemoryStream GetFileData()
         {
             using (FileStream stream = new FileStream(PathFile, FileMode.Open, FileAccess.Read))
             {
@@ -102,14 +69,19 @@ namespace NetCoreFileAccess.SourceAccess.AccessTypes
                 return ms;
             }
         }
+
         #endregion
 
         #region PRIVATE METHODS
 
+        /// <summary>
+        /// Obtain the path of the data file to be used for saving and loading data. If the file does not exist, it creates a new one with a random name. If the file exists but is empty, it sets the IsInicializing flag to true to indicate that the source access is being initialized for the first time.
+        /// </summary>
+        /// <returns></returns>
         private string GetPathDataFile()
         {
-            string path = Path.Combine(AppContext.BaseDirectory, DATA_FOLDER);
-
+            string path = Path.Combine(Environment.GetFolderPath( Environment.SpecialFolder.Personal) , this.ClientAPP);
+            
             //Create data folder if not exists
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
@@ -121,22 +93,19 @@ namespace NetCoreFileAccess.SourceAccess.AccessTypes
                 //file not exist
                 string fileName = Path.GetFileNameWithoutExtension(Path.GetRandomFileName()) + FILE_EXTENSION;
                 _File = Path.Combine(path, fileName);
-                IsInicializing = true;                
-                return _File;
+                IsInicializing = true;                                
             }
             else
             {
                 FileInfo fileInfo = new FileInfo(_File);
                 if (fileInfo.Length == 0)
-                {
-                    //the file is empty
-                    IsInicializing = true;
-                    return string.Empty;
+                {                    
+                    IsInicializing = true;  //file is empty                  
                 }
+                else
+                    IsInicializing = false; //file exist and is not empty
             }
-
-            //file exist and is not empty
-            IsInicializing = false;
+            
             return _File;
         }
         

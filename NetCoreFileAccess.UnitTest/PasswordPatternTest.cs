@@ -1,5 +1,4 @@
-﻿using NUnit.Framework;
-using NetCoreFileAccess;
+﻿using NetCoreFileAccess;
 
 namespace SecureBunker.UnitTests
 {
