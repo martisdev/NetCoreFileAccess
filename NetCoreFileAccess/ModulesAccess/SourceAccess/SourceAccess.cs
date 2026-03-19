@@ -37,6 +37,11 @@ namespace NetCoreFileAccess.SourceAccess
             get {return _sourceAccess.Password; }
         }
 
+        public SourceType SourceType 
+        {
+            get { return _sourceAccess.SourceType; }
+        }
+
         public string? ClientAPP { get; set; }
 
         #endregion

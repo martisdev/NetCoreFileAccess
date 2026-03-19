@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Diagnostics.Eventing.Reader;
+using System.IO;
 
 namespace NetCoreFileAccess.SourceAccess
 {
@@ -6,14 +7,13 @@ namespace NetCoreFileAccess.SourceAccess
     {
         #region CONSTANTS
         
-        //private const string DATA_FOLDER = "data";
-        
         private const string FILE_EXTENSION = ".fscr";
         #endregion
 
         #region CONSTRUCTORS
         public LocalAccess(string clientApp)
         {
+            this.SourceType = SourceType.Local;
             this.ClientAPP = clientApp;
             this.PathFile = GetPathDataFile();
         }
@@ -31,8 +31,7 @@ namespace NetCoreFileAccess.SourceAccess
         /// depend on the implementation.</param>
         /// <returns><see langword="true"/> if the login attempt is successful; otherwise, <see langword="false"/>.</returns>
         public override bool TryLogin(params object[] Options)
-        {
-            
+        {            
             return base.TryLogin(Options);
         }
 
@@ -94,22 +93,19 @@ namespace NetCoreFileAccess.SourceAccess
                 //file not exist
                 string fileName = Path.GetFileNameWithoutExtension(Path.GetRandomFileName()) + FILE_EXTENSION;
                 _File = Path.Combine(path, fileName);
-                IsInicializing = true;                
-                return _File;
+                IsInicializing = true;                                
             }
             else
             {
                 FileInfo fileInfo = new FileInfo(_File);
                 if (fileInfo.Length == 0)
-                {
-                    //the file is empty
-                    IsInicializing = true;
-                    return string.Empty;
+                {                    
+                    IsInicializing = true;  //file is empty                  
                 }
+                else
+                    IsInicializing = false; //file exist and is not empty
             }
-
-            //file exist and is not empty
-            IsInicializing = false;
+            
             return _File;
         }
         

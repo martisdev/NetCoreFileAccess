@@ -27,10 +27,11 @@ namespace NetCoreFileAccess.SourceAccess
         #region CONSTRUCTORS   
         public GoogleDriveAccess(string clientApp)
         {
+            this.SourceType = SourceType.GoogleDrive;
             this.ClientAPP = clientApp;
-            PathFile = string.Empty;
-            UserName = string.Empty;
-            Password = string.Empty;
+            this.PathFile = string.Empty;
+            this.UserName = string.Empty;
+            this.Password = string.Empty;
         }
         #endregion
 

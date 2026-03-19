@@ -27,10 +27,11 @@ namespace NetCoreFileAccess.SourceAccess
         #region CONSTRUCTORS
         public FtpAccess(string clientApp)
         {
+            this.SourceType = SourceType.Ftp;
             this.ClientAPP = clientApp;
-            URI = string.Empty;
-            FTPUserName = string.Empty;
-            FTPPassword = string.Empty;
+            this.URI = string.Empty;
+            this.FTPUserName = string.Empty;
+            this.FTPPassword = string.Empty;
 
         }
         #endregion

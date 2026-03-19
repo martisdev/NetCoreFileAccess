@@ -114,6 +114,8 @@ namespace NetCoreFileAccess
                 return ;
 
             //Create config file if not exists
+            // set default values
+            Config.sourceType = SourceType.Local;
             SaveConfigurationFile();            
         }
         
