@@ -59,20 +59,20 @@ namespace NetCoreFileAccess
             }
         }
 
-        public static void LoadConfigurationFile()
+        public static SourceType LoadConfigurationFile()
         {
             try
-            {
+            {                
                 SetConfigFile();
 
                 if (string.IsNullOrEmpty(ConfigFile) || !File.Exists(ConfigFile))
-                    return;
+                    return SourceType.None;
 
                 var json = File.ReadAllText(ConfigFile);
                 var options = new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true };
                 var model = System.Text.Json.JsonSerializer.Deserialize<ConfigModel>(json, options);
                 if (model == null)
-                    return;
+                    return SourceType.None;
 
                 // map back to static Config
                 if (!string.IsNullOrEmpty(model.Source) && Enum.TryParse<SourceType>(model.Source, out var st))
@@ -94,8 +94,10 @@ namespace NetCoreFileAccess
             }
             catch
             {
+                return SourceType.None;
                 // swallow or log as appropriate
             }
+            return Config.sourceType;            
         }
 
         #endregion
